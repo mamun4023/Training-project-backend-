@@ -1,7 +1,8 @@
 const express = require('express')
 const app = express();
 const {client} = require('./models/db')
-
+const {graphqlHTTP} = require('express-graphql');
+const Schema = require('./graphql/schema');
 
 client.connect()
   .then(()=>{
@@ -10,7 +11,10 @@ client.connect()
 
 
 
-
+app.use('/', graphqlHTTP({
+  schema : Schema,
+  graphiql : true,
+}))
 
 
 
