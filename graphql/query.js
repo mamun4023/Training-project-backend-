@@ -1,31 +1,69 @@
-const {GraphQLObjectType, GraphQLList} = require('graphql');
+const {GraphQLObjectType, GraphQLList, GraphQLID, GraphQLInt} = require('graphql');
 const { UserType, ProductType ,TransactionType} = require('./types');
+const {client} = require('../models/db');
+const {GraphQLString} = require('graphql')
 
-const TransactionData = require('./jsonData/transaction.json')
-const UserData = require('./jsonData/user.json');
-const ProductData = require('./jsonData/product.json');
+// const TransactionData = require('./jsonData/transaction.json')
+// const UserData = require('./jsonData/user.json');
+// const ProductData = require('./jsonData/product.json');
 
 const RootQuery = new GraphQLObjectType({
     name : "rootQuery",
     fields : {
-        transactionList : {
+        transactions : {
             type : new GraphQLList(TransactionType),
-            resolve(parent, args){
-                return TransactionData
+            args : {limit : {type : GraphQLID}, page : {type : GraphQLID}},
+            async resolve(parent, args){    
+                let Limit = (args.limit*1);
+                let Offset = args.limit * (args.page-1)
+                let data = await client.query(`SELECT * FROM transactions limit ${Limit} offset ${Offset}`)
+                return data.rows
             }
         },
-        userList : {
+        transaction : {
+            type : new GraphQLList(TransactionType),
+            args : {id : {type : GraphQLID}},
+            async resolve(parent, args){    
+                let data = await client.query(`SELECT * FROM transactions WHERE id = ${args.id}`)
+                return data.rows
+            }
+        },
+        users : {
             type : new GraphQLList(UserType),
-            resolve(parent, args){
-                return UserData
+            args : {limit : {type : GraphQLID}, page : {type : GraphQLID}},
+            async resolve(parent, args){    
+                let Limit = (args.limit*1);
+                let Offset = args.limit * (args.page-1)
+                let data = await client.query(`SELECT * FROM users limit ${Limit} offset ${Offset}`)
+                return data.rows
+            },
+        },
+        user : {
+            type : new GraphQLList(UserType),
+            args : {id : {type : GraphQLID}},
+            async resolve(parent, args){
+                let user = await client.query(`SELECT * FROM users WHERE id=${args.id}`)
+                return user.rows
             }
         },
-        productList: {
+        products: {
             type : new GraphQLList(ProductType),
-            resolve(parent, args){
-                return ProductData
+            args : {limit : {type : GraphQLID}, page : {type : GraphQLID}},
+            async resolve(parent, args){    
+                let Limit = (args.limit*1);
+                let Offset = args.limit * (args.page-1)
+                let data = await client.query(`SELECT * FROM products limit ${Limit} offset ${Offset}`)
+                return data.rows
             }
-        }
+        },
+        product : {
+            type : new GraphQLList(ProductType),
+            args : {id : {type : GraphQLID}},
+            async resolve(parent, args){
+                let product = await client.query(`SELECT * FROM products WHERE id = ${args.id}`)
+                return product.rows
+            }
+        },
     }
 })
 
