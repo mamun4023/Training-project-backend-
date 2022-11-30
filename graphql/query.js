@@ -3,9 +3,6 @@ const { UserType, ProductType ,TransactionType} = require('./types');
 const {client} = require('../models/db');
 const {GraphQLString} = require('graphql')
 
-// const TransactionData = require('./jsonData/transaction.json')
-// const UserData = require('./jsonData/user.json');
-// const ProductData = require('./jsonData/product.json');
 
 const RootQuery = new GraphQLObjectType({
     name : "rootQuery",

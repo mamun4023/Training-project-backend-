@@ -1,5 +1,18 @@
 const {GraphQLObjectType, GraphQLID, GraphQLString} = require('graphql')
 
+
+const UserRegistrationType = new GraphQLObjectType({
+    name : "RegisterType",
+    fields : ()=> ({
+        id : {type : GraphQLID},
+        fullName : {type : GraphQLString},
+        email : {type : GraphQLString},
+        password : {type : GraphQLString},
+    })
+})
+
+
+
 const UserType = new GraphQLObjectType({
     name : "userType",
     fields : ()=> ({
@@ -45,6 +58,7 @@ const TransactionType = new GraphQLObjectType({
 })
 
 module.exports = {
+    UserRegistrationType,
     UserType,
     ProductType,
     TransactionType
