@@ -1,14 +1,14 @@
 const {GraphQLObjectType, GraphQLNonNull, GraphQLString, GraphQLID} = require('graphql');
 const { client } = require('../models/db');
-const {UserType, ProductType, TransactionType, UserRegistrationType} = require('./types');
-
+const { SignupType, LoginType, UserType} = require('./types');
+const {CreateJwtToken} = require('../utils/auth');
 
 const Mutation = new GraphQLObjectType({
-    name : 'mutaion',
+    name : 'mutaions',
     fields : {
         userSignUp: {
-            type : UserRegistrationType,
-            description : "Registration successfull",
+            type : SignupType,
+            description : "User Registration",
             args : {
                 fullName : {type : new GraphQLNonNull(GraphQLString)},
                 email : {type : new GraphQLNonNull(GraphQLString)},
@@ -16,8 +16,27 @@ const Mutation = new GraphQLObjectType({
             },
             
             async resolve(parent, args, description){
-                let register = await client.query(`INSERT INTO registers ("fullName", "email", "password") VALUES ('${args.fullName}', '${args.email}', '${args.password}')`)             
-                return register.row
+                await client.query(`INSERT INTO registers ("fullName", "email", "password") VALUES ('${args.fullName}', '${args.email}', '${args.password}')`)             
+                return  {message : "Registration has been succesfull"}
+            }
+        },
+
+        userLogin : {
+            type : LoginType,
+            description : "user Login",
+            args : {
+                email : {type : GraphQLString},
+                password : {type : GraphQLString}
+            },
+            async resolve(parent, args){
+                const userRow = await client.query(`SELECT email, password from registers WHERE email = '${args.email}' LIMIT 1`)
+                const [user] = userRow.rows
+                if(!user || args.password !== user.password){
+                    throw new Error('Invalid Credentials') 
+                }
+                const token = CreateJwtToken(user);
+                return { message : "Login Successfull", token : token}
+                
             }
         },
         addUser : {
@@ -27,22 +46,22 @@ const Mutation = new GraphQLObjectType({
                 lastName :  {type : new GraphQLNonNull(GraphQLString)},
                 image :  {type : new GraphQLNonNull(GraphQLString)},
                 age :  {type : new GraphQLNonNull(GraphQLString)},
-                gender :  {type : new GraphQLNonNull(GraphQLString)},
                 email :  {type : new GraphQLNonNull(GraphQLString)},
                 phone :  {type : new GraphQLNonNull(GraphQLString)},
                 birthDate :  {type : new GraphQLNonNull(GraphQLString)},
                 bloodGroup :  {type : new GraphQLNonNull(GraphQLString)},
             },
             async resolve(parent, args){
-                let user = await client.query(`INSERT INTO users ("firstName", "lastName", "image", "age", "gender", "email", "phone", "birthDate", "bloodGroup" ) values('${args.firstName}', '${args.lastName}', '${args.image}', '${args.age}', '${args.gender}', '${args.email}', '${args.phone}', '${args.birthDate}', '${args.bloodGroup}' )`)
-                return user.rows
+                await client.query(`INSERT INTO users ("firstName", "lastName", "image", "age", "email", "phone", "birthDate", "bloodGroup" ) values('${args.firstName}', '${args.lastName}', '${args.image}', '${args.age}', '${args.email}', '${args.phone}', '${args.birthDate}', '${args.bloodGroup}' )`)
+                return  {message : "User has been added"}
             }
         },
         removeUser : {
             type : UserType,
             args : {id : {type : GraphQLID}},
             async resolve(parent, args){
-              return await client.query(`DELETE FROM users WHERE id=${args.id}`)
+               await client.query(`DELETE FROM users WHERE id=${args.id}`)
+               return {message : "User has been deleted"}
             }
         }
     }

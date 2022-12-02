@@ -1,7 +1,6 @@
 const {GraphQLObjectType, GraphQLList, GraphQLID, GraphQLInt} = require('graphql');
-const { UserType, ProductType ,TransactionType} = require('./types');
+const { UserQueryType, ProductType ,TransactionType, UserLoginType} = require('./types');
 const {client} = require('../models/db');
-const {GraphQLString} = require('graphql')
 
 
 const RootQuery = new GraphQLObjectType({
@@ -26,7 +25,7 @@ const RootQuery = new GraphQLObjectType({
             }
         },
         users : {
-            type : new GraphQLList(UserType),
+            type : new GraphQLList(UserQueryType),
             args : {limit : {type : GraphQLID}, page : {type : GraphQLID}},
             async resolve(parent, args){    
                 let Limit = (args.limit*1);
@@ -36,7 +35,7 @@ const RootQuery = new GraphQLObjectType({
             },
         },
         user : {
-            type : new GraphQLList(UserType),
+            type : new GraphQLList(UserQueryType),
             args : {id : {type : GraphQLID}},
             async resolve(parent, args){
                 let user = await client.query(`SELECT * FROM users WHERE id=${args.id}`)
@@ -63,7 +62,6 @@ const RootQuery = new GraphQLObjectType({
         },
     }
 })
-
 
 
 module.exports =  RootQuery;

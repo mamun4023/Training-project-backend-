@@ -1,20 +1,24 @@
 const {GraphQLObjectType, GraphQLID, GraphQLString} = require('graphql')
 
-
-const UserRegistrationType = new GraphQLObjectType({
-    name : "RegisterType",
+const SignupType = new GraphQLObjectType({
+    name : "SignupType",
     fields : ()=> ({
-        id : {type : GraphQLID},
-        fullName : {type : GraphQLString},
-        email : {type : GraphQLString},
-        password : {type : GraphQLString},
+        message : {type : GraphQLString},
+        token : {type : GraphQLString},
+    })
+})
+
+const LoginType = new GraphQLObjectType({
+    name : "LoginType",
+    fields : ()=> ({
+        message : {type : GraphQLString},
+        token : {type : GraphQLString},
     })
 })
 
 
-
-const UserType = new GraphQLObjectType({
-    name : "userType",
+const UserQueryType = new GraphQLObjectType({
+    name : "userQueryType",
     fields : ()=> ({
         id : {type : GraphQLID},
         firstName : {type : GraphQLString},
@@ -25,6 +29,13 @@ const UserType = new GraphQLObjectType({
         phone : {type : GraphQLString},
         email : {type : GraphQLString},
         bloodGroup : {type : GraphQLString}
+    })
+})
+
+const UserType = new GraphQLObjectType({
+    name : "userType",
+    fields : ()=> ({
+        message : {type : GraphQLString},
     })
 })
 
@@ -58,8 +69,10 @@ const TransactionType = new GraphQLObjectType({
 })
 
 module.exports = {
-    UserRegistrationType,
+    SignupType,
+    LoginType,
     UserType,
+    UserQueryType,
     ProductType,
     TransactionType
 }
