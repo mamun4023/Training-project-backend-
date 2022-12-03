@@ -8,6 +8,4 @@ const client = new Client({
     database : 'shop'
 })
 
-
-
 module.exports = {client}
