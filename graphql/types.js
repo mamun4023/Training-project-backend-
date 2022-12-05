@@ -15,6 +15,12 @@ const LoginType = new GraphQLObjectType({
         token : {type : GraphQLString},
     })
 })
+const UpdateType = new GraphQLObjectType({
+    name : "UpdateType",
+    fields : ()=> ({
+        message : {type : GraphQLString},
+    })
+})
 
 
 const UserQueryType = new GraphQLObjectType({
@@ -72,6 +78,7 @@ module.exports = {
     SignupType,
     LoginType,
     UserType,
+    UpdateType,
     UserQueryType,
     ProductType,
     TransactionType

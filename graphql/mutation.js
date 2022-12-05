@@ -1,6 +1,6 @@
 const {GraphQLObjectType, GraphQLNonNull, GraphQLString, GraphQLID} = require('graphql');
 const { client } = require('../models/db');
-const { SignupType, LoginType, UserType} = require('./types');
+const { SignupType, LoginType, UserType, UpdateType} = require('./types');
 const {CreateJwtToken} = require('../utils/auth');
 
 const Mutation = new GraphQLObjectType({
@@ -15,7 +15,7 @@ const Mutation = new GraphQLObjectType({
                 password : {type : new GraphQLNonNull(GraphQLString)}
             },
             
-            async resolve(parent, args, description){
+            async resolve(parent, args){
                 await client.query(`INSERT INTO registers ("fullName", "email", "password") VALUES ('${args.fullName}', '${args.email}', '${args.password}')`)             
                 return  {message : "Registration has been succesfull"}
             }
@@ -63,6 +63,35 @@ const Mutation = new GraphQLObjectType({
                await client.query(`DELETE FROM users WHERE id=${args.id}`)
                return {message : "User has been deleted"}
             }
+        },
+        updateUser : {
+            type : UpdateType,
+            args : {
+                id : {type : new GraphQLNonNull(GraphQLID)},
+                firstName : {type : new GraphQLNonNull(GraphQLString)},
+                lastName : {type : new GraphQLNonNull(GraphQLString)},
+                image :  {type : new GraphQLNonNull(GraphQLString)},
+                age :  {type : new GraphQLNonNull(GraphQLString)},
+                email : {type : new GraphQLNonNull(GraphQLString)},
+                phone : {type : new GraphQLNonNull(GraphQLString)},
+                birthDate : {type : new GraphQLNonNull(GraphQLString)},
+                bloodGroup : {type : new GraphQLNonNull(GraphQLString)},
+            },
+            async resolve(parent, args){
+                await client.query(`UPDATE users SET 
+                        "firstName" = '${args.firstName}', 
+                        "lastName" = '${args.lastName}',
+                        "image" = '${args.image}',
+                        "age" = '${args.age}',
+                        "birthDate" = '${args.birthDate}',
+                        "phone" = '${args.phone}',
+                        "email" = '${args.email}',
+                        "bloodGroup" = '${args.bloodGroup}'
+                    where id = ${args.id};`
+                )
+
+                return {message : "User updated"}
+            }  
         }
     }
 })
